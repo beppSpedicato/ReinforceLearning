@@ -60,14 +60,14 @@ def main():
 
 			train_reward += reward
 
-		agent.update_policy()
+		agent.update_policy()   #riga aggiunta forse per actor critic non serve perche update diversamente?
 		
 		if (episode+1)%args.print_every == 0:
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 
 
-	torch.save(agent.policy.state_dict(), f"model_reinforce_b{args.baseline}.mdl")
+	torch.save(agent.policy.state_dict(), f"model_reinforce_b{args.baseline}.mdl")  #riga modificata
 
 	
 
