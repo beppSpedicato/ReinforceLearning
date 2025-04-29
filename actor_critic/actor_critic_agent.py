@@ -128,14 +128,13 @@ class ActorCriticAgent(object):
         critic_loss = F.mse_loss(state_values, targets.detach())
     
         # Total loss (optional: sum or weighted sum)
-        print(critic_loss)
-        print(actor_loss)
-        total_loss = actor_loss + critic_loss
-
-        print(total_loss)
+        # total_loss = actor_loss + critic_loss
 
 
-        total_loss.backward()
+        actor_loss.backward()
+        self.optimizer.step()
+
+        critic_loss.backward()
         self.optimizer.step()
     
         # Reset buffers again (if used for actor-critic separately)
