@@ -94,28 +94,6 @@ class ActorCriticAgent(object):
         rewards = torch.stack(self.rewards, dim=0).to(self.train_device).squeeze(-1)
         done = torch.Tensor(self.done).to(self.train_device)
 
-        #
-        # TASK 2:
-        #   - compute discounted returns
-        #   - compute policy gradient loss function given actions and returns
-        #   - compute gradients and step the optimizer
-        #
-
-        # compute discounted returns
-        discounted_returns = discount_rewards(rewards, self.gamma)
-        discounted_returns = discounted_returns.to(self.train_device).squeeze(-1)
-        discounted_returns = (discounted_returns - discounted_returns.mean())/ discounted_returns.std()
-        discounted_returns = discounted_returns - self.baseline
-        
-        # compute policy gradient loss function given actions and returns
-        self.optimizer.zero_grad()
-        loss = -torch.mul(discounted_returns, action_log_probs).mean()
-
-        # compute gradients and step the optimizer
-        loss.backward()
-        self.optimizer.step()
-
-        # self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
          #
         # TASK 3:
         #   - compute boostrapped discounted return estimates
