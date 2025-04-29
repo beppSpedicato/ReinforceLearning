@@ -35,7 +35,10 @@ class ReinforcePolicy(torch.nn.Module):
         
         """ critic network"""
         # TASK 3: critic network for actor-critic algorithm
-        
+        self.fc1_critic = torch.nn.Linear(state_space, self.hidden)
+        self.fc2_critic = torch.nn.Linear(self.hidden, self.hidden)
+        self.fc3_critic_value = torch.nn.Linear(self.hidden, 1)
+
         self.init_weights()
 
 
@@ -57,9 +60,15 @@ class ReinforcePolicy(torch.nn.Module):
         sigma = self.sigma_activation(self.sigma)
         normal_dist = Normal(action_mean, sigma)
 
-        # TASK 3: forward in te critic network
+        """
+            Critic
+        """
+        x_critic = self.tanh(self.fc1_critic(x))
+        x_critic = self.tanh(self.fc2_critic(x_critic))
+        state_value = self.fc3_critic_value(x_critic).squeeze(-1)  # [batch]
 
-        return normal_dist
+        return normal_dist, state_value
+
 
 
 class ReinforceAgent(object):
@@ -113,7 +122,39 @@ class ReinforceAgent(object):
         #   - compute advantage terms
         #   - compute actor loss and critic loss
         #   - compute gradients and step the optimizer
-        #
+
+
+        states = torch.stack(self.states, dim=0).to(self.train_device)
+        next_states = torch.stack(self.next_states, dim=0).to(self.train_device)
+        rewards = torch.stack(self.rewards, dim=0).to(self.train_device).squeeze(-1)
+        action_log_probs = torch.stack(self.action_log_probs, dim=0).to(self.train_device)
+        done = torch.Tensor(self.done).to(self.train_device)
+    
+        # Forward pass: get value estimates
+        _, state_values = self.policy(states)
+        _, next_state_values = self.policy(next_states)
+    
+        # Bootstrapped target: r + γ * V(s') * (1 - done)
+        targets = rewards + self.gamma * next_state_values * (1 - done)
+    
+        # Advantage: A(s,a) = target - V(s)
+        advantages = targets.detach() - state_values
+    
+        # Actor loss
+        actor_loss = -torch.mean(action_log_probs * advantages.detach())
+    
+        # Critic loss
+        critic_loss = F.mse_loss(state_values, targets.detach())
+    
+        # Total loss (optional: sum or weighted sum)
+        total_loss = actor_loss + critic_loss
+    
+        self.optimizer.zero_grad()
+        total_loss.backward()
+        self.optimizer.step()
+    
+        # Reset buffers again (if used for actor-critic separately)
+        self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
         return        
 
 
@@ -121,7 +162,7 @@ class ReinforceAgent(object):
         """ state -> action (3-d), action_log_densities """
         x = torch.from_numpy(state).float().to(self.train_device)
 
-        normal_dist = self.policy(x)
+        normal_dist, _ = self.policy(x)     #cambiamento per actor critic
 
         if evaluation:  # Return mean
             return normal_dist.mean, None
