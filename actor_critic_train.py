@@ -7,7 +7,8 @@ import torch
 import gym
 
 from env.custom_hopper import *
-from reinforce_agent import ReinforcePolicy, ReinforceAgent
+from actor_critic.actor_critic_agent import ActorCriticAgent, ActorCriticPolicy
+
 
 
 def parse_args():
@@ -38,8 +39,8 @@ def main():
 	observation_space_dim = env.observation_space.shape[-1]
 	action_space_dim = env.action_space.shape[-1]
 
-	policy = ReinforcePolicy(observation_space_dim, action_space_dim)
-	agent = ReinforceAgent(policy, device=args.device, baseline=args.baseline)
+	policy = ActorCriticPolicy(observation_space_dim, action_space_dim)
+	agent = ActorCriticAgent(policy, device=args.device, baseline=args.baseline)
 
     #
     # TASK 2: interleave data collection to policy updates
@@ -60,14 +61,14 @@ def main():
 
 			train_reward += reward
 
-		agent.update_policy()   #riga aggiunta forse per actor critic non serve perche update diversamente?
+		agent.update_policy()
 		
 		if (episode+1)%args.print_every == 0:
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 
 
-	torch.save(agent.policy.state_dict(), f"model_reinforce_b{args.baseline}.mdl")  #riga modificata
+	torch.save(agent.policy.state_dict(), f"model_actorcritic_b{args.baseline}.mdl")  #riga modificata
 
 	
 
