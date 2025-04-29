@@ -32,7 +32,10 @@ class ReinforcePolicy(torch.nn.Module):
         self.sigma_activation = F.softplus
         init_sigma = 0.5
         self.sigma = torch.nn.Parameter(torch.zeros(self.action_space)+init_sigma)
-
+        
+        """ critic network"""
+        # TASK 3: critic network for actor-critic algorithm
+        
         self.init_weights()
 
 
@@ -53,6 +56,8 @@ class ReinforcePolicy(torch.nn.Module):
 
         sigma = self.sigma_activation(self.sigma)
         normal_dist = Normal(action_mean, sigma)
+
+        # TASK 3: forward in te critic network
 
         return normal_dist
 
@@ -102,7 +107,13 @@ class ReinforceAgent(object):
         self.optimizer.step()
 
         self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
-
+         #
+        # TASK 3:
+        #   - compute boostrapped discounted return estimates
+        #   - compute advantage terms
+        #   - compute actor loss and critic loss
+        #   - compute gradients and step the optimizer
+        #
         return        
 
 
