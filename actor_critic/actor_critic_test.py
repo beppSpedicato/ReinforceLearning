@@ -7,6 +7,20 @@ import gym
 from env.custom_hopper import *
 from actor_critic.actor_critic_agent import ActorCriticAgent, ActorCriticPolicy
 
+import matplotlib.pyplot as plt
+
+def plotRewards (train_rewards):
+	plt.figure(figsize=(10, 5))
+	plt.plot(train_rewards, label=f'TEST reward per episode for model actor critic')
+	plt.xlabel('Episode')
+	plt.ylabel('Reward')
+	plt.title('Test Rewards')
+	plt.legend()
+	plt.grid(True)
+	plt.tight_layout()
+	plt.savefig(f"test_rewards_for_actor_critic.png")
+	plt.close()
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', default=None, type=str, help='Model path')
@@ -36,6 +50,8 @@ def main():
 
 	agent = ActorCriticAgent(policy, device=args.device)
 
+	test_rewards = []
+
 	for episode in range(args.episodes):
 		done = False
 		test_reward = 0
@@ -51,8 +67,12 @@ def main():
 				env.render()
 
 			test_reward += reward
+		
+		test_rewards.append(test_reward)
 
 		print(f"Episode: {episode} | Return: {test_reward}")
+	
+	plotRewards(test_rewards)
 	
 
 if __name__ == '__main__':

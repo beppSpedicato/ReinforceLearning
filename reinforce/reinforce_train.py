@@ -8,6 +8,7 @@ import gym
 
 from env.custom_hopper import *
 from reinforce.reinforce_agent import ReinforcePolicy, ReinforceAgent
+import matplotlib.pyplot as plt
 
 
 def parse_args():
@@ -16,8 +17,21 @@ def parse_args():
     parser.add_argument('--print-every', default=20000, type=int, help='Print info every <> episodes')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--baseline', default=0, type=int, help='baseline for reinforce update policy')
+    parser.add_argument('--plot', default=True, type=bool, help='enable the creation of rewards plot')
 
     return parser.parse_args()
+
+def plotRewards (train_rewards, baseline):
+	plt.figure(figsize=(10, 5))
+	plt.plot(train_rewards, label='Train reward per episode')
+	plt.xlabel('Episode')
+	plt.ylabel('Reward')
+	plt.title('Training Rewards')
+	plt.legend()
+	plt.grid(True)
+	plt.tight_layout()
+	plt.savefig(f"train_rewards_reinforce_b{baseline}.png")
+	plt.close()
 
 args = parse_args()
 
@@ -44,6 +58,7 @@ def main():
     #
     # TASK 2: interleave data collection to policy updates
     #
+	train_rewards = []
 
 	for episode in range(args.n_episodes):
 		done = False
@@ -61,12 +76,15 @@ def main():
 			train_reward += reward
 
 		agent.update_policy()
+		train_rewards.append(train_reward)
+
+		
 		
 		if (episode+1)%args.print_every == 0:
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 
-
+	plotRewards(train_rewards, args.baseline)
 	torch.save(agent.policy.state_dict(), f"model_reinforce_b{args.baseline}.mdl")  #riga modificata
 
 	

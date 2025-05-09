@@ -101,12 +101,8 @@ class ActorCriticAgent(object):
         #   - compute actor loss and critic loss
         #   - compute gradients and step the optimizer
 
-
-        # states = torch.stack(self.states, dim=0).to(self.train_device)
-        # next_states = torch.stack(self.next_states, dim=0).to(self.train_device)
-        # rewards = torch.stack(self.rewards, dim=0).to(self.train_device).squeeze(-1)
-        # action_log_probs = torch.stack(self.action_log_probs, dim=0).to(self.train_device)
-        # done = torch.Tensor(self.done).to(self.train_device)
+        # Reset buffers again (if used for actor-critic separately)
+        self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
     
         # Forward pass: get value estimates
         _, state_values = self.policy(states)
@@ -137,8 +133,7 @@ class ActorCriticAgent(object):
         critic_loss.backward()
         self.optimizer.step()
     
-        # Reset buffers again (if used for actor-critic separately)
-        self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
+        
         return        
 
 

@@ -20,7 +20,9 @@ from env.custom_hopper import *
 
 
 def main():
-	env = gym.make('CustomHopper-source-v0')
+
+	env = gym.make('CustomHopper-v0')
+	# env = gym.make('CustomHopper-source-v0')
 	# env = gym.make('CustomHopper-target-v0')
 
 	print('State space:', env.observation_space) # state-space

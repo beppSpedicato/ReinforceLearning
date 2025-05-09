@@ -6,10 +6,25 @@ import gym
 
 from env.custom_hopper import *
 from reinforce.reinforce_agent import ReinforceAgent, ReinforcePolicy
+import time
+
+import matplotlib.pyplot as plt
+
+def plotRewards (train_rewards):
+	plt.figure(figsize=(10, 5))
+	plt.plot(train_rewards, label=f'TEST reward per episode for model reinforce b20')
+	plt.xlabel('Episode')
+	plt.ylabel('Reward')
+	plt.title('Test Rewards')
+	plt.legend()
+	plt.grid(True)
+	plt.tight_layout()
+	plt.savefig(f"test_rewards_for_model_reinforce_b20.png")
+	plt.close()
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', default=None, type=str, help='Model path')
+    parser.add_argument('--model', default="./trained-models/model_reinforce_b0.mdl", type=str, help='Model path')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--render', default=False, action='store_true', help='Render the simulator')
     parser.add_argument('--episodes', default=1000, type=int, help='Number of test episodes')
@@ -36,6 +51,8 @@ def main():
 
 	agent = ReinforceAgent(policy, device=args.device)
 
+	test_rewards = []
+
 	for episode in range(args.episodes):
 		done = False
 		test_reward = 0
@@ -49,10 +66,16 @@ def main():
 
 			if args.render:
 				env.render()
+			
+			# time.sleep(0.01)
 
 			test_reward += reward
+		
+		test_rewards.append(test_reward)
 
 		print(f"Episode: {episode} | Return: {test_reward}")
+	
+	plotRewards(test_rewards)
 	
 
 if __name__ == '__main__':
