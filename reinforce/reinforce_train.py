@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--n-episodes', default=100000, type=int, help='Number of training episodes')
-    parser.add_argument('--print-every', default=20000, type=int, help='Print info every <> episodes')
+    parser.add_argument('--print-every', default=2000, type=int, help='Print info every <> episodes')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--baseline', default=0, type=int, help='baseline for reinforce update policy')
     parser.add_argument('--plot', default=True, type=bool, help='enable the creation of rewards plot')
@@ -31,6 +31,18 @@ def plotRewards (train_rewards, baseline):
 	plt.grid(True)
 	plt.tight_layout()
 	plt.savefig(f"train_rewards_reinforce_b{baseline}.png")
+	plt.close()
+
+def plotTimesteps (train_rewards, baseline):
+	plt.figure(figsize=(10, 5))
+	plt.plot(train_rewards, label='timestepper episode')
+	plt.xlabel('Episode')
+	plt.ylabel('Timestep')
+	plt.title('Training timestep')
+	plt.legend()
+	plt.grid(True)
+	plt.tight_layout()
+	plt.savefig(f"train_timestep_reinforce_b{baseline}.png")
 	plt.close()
 
 args = parse_args()
@@ -59,10 +71,13 @@ def main():
     # TASK 2: interleave data collection to policy updates
     #
 	train_rewards = []
+	timesteps = []
+	max_train_reward = False
 
 	for episode in range(args.n_episodes):
 		done = False
 		train_reward = 0
+		timestep = 0
 		state = env.reset()  # Reset the environment and observe the initial state
 
 		while not done:  # Loop until the episode is over
@@ -74,16 +89,17 @@ def main():
 			agent.store_outcome(previous_state, state, action_probabilities, reward, done)
 
 			train_reward += reward
+			timestep = timestep + 1
 
 		agent.update_policy()
 		train_rewards.append(train_reward)
+		timesteps.append(timestep)
 
-		
-		
 		if (episode+1)%args.print_every == 0:
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 
+	plotTimesteps(timesteps, args.baseline)
 	plotRewards(train_rewards, args.baseline)
 	torch.save(agent.policy.state_dict(), f"model_reinforce_b{args.baseline}.mdl")  #riga modificata
 

@@ -81,7 +81,7 @@ class ReinforceAgent(object):
         done = torch.Tensor(self.done).to(self.train_device)
 
         self.states, self.next_states, self.action_log_probs, self.rewards, self.done = [], [], [], [], []
-
+        #print(rewards)
         #
         # TASK 2:
         #   - compute discounted returns
@@ -91,10 +91,10 @@ class ReinforceAgent(object):
 
         # compute discounted returns
         discounted_returns = discount_rewards(rewards, self.gamma)
-        discounted_returns = discounted_returns.to(self.train_device).squeeze(-1)
+        # discounted_returns = discounted_returns.to(self.train_device).squeeze(-1)
         discounted_returns = (discounted_returns - discounted_returns.mean())/ discounted_returns.std()
         discounted_returns = discounted_returns - self.baseline
-        
+
         # compute policy gradient loss function given actions and returns
         self.optimizer.zero_grad()
         loss = -torch.mul(discounted_returns, action_log_probs).mean()
