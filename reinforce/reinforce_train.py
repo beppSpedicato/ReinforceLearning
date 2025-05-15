@@ -9,12 +9,14 @@ import gym
 from env.custom_hopper import *
 from reinforce.reinforce_agent import ReinforcePolicy, ReinforceAgent
 import matplotlib.pyplot as plt
+import random
+import numpy as np
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--n-episodes', default=100000, type=int, help='Number of training episodes')
-    parser.add_argument('--print-every', default=2000, type=int, help='Print info every <> episodes')
+    parser.add_argument('--n-episodes', default=1000, type=int, help='Number of training episodes')
+    parser.add_argument('--print-every', default=200, type=int, help='Print info every <> episodes')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--baseline', default=0, type=int, help='baseline for reinforce update policy')
     parser.add_argument('--plot', default=True, type=bool, help='enable the creation of rewards plot')
@@ -49,9 +51,14 @@ args = parse_args()
 
 
 def main():
+	random.seed(1)
+	np.random.seed(1)
+	torch.manual_seed(1)
 
 	env = gym.make('CustomHopper-source-v0')
 	# env = gym.make('CustomHopper-target-v0')
+
+	#env.seed(32)
 
 	print('Action space:', env.action_space)
 	print('State space:', env.observation_space)

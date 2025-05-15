@@ -8,6 +8,9 @@ import gym
 from env.custom_hopper import *
 from stable_baselines3 import PPO
 import argparse
+import torch
+import random
+import numpy as np
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -20,6 +23,10 @@ def parse_args():
 args = parse_args()
 
 def main():
+    random.seed(1)
+    np.random.seed(1)
+    torch.manual_seed(1)
+    
     train_env = gym.make('CustomHopper-target-v0')
 
     print('State space:', train_env.observation_space)  # state-space

@@ -5,6 +5,8 @@ import argparse
 
 import torch
 import gym
+import random
+import numpy as np
 
 from env.custom_hopper import *
 from actor_critic.actor_critic_agent import ActorCriticAgent, ActorCriticPolicy
@@ -38,6 +40,9 @@ args = parse_args()
 
 
 def main():
+	random.seed(1)
+	np.random.seed(1)
+	torch.manual_seed(1)
 	env = gym.make('CustomHopper-source-v0')
 	# env = gym.make('CustomHopper-target-v0')
 
