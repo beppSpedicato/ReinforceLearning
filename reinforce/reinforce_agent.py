@@ -37,9 +37,13 @@ class ReinforcePolicy(torch.nn.Module):
 
 
     def init_weights(self):
-        torch.nn.init.kaiming_normal_(self.fc1_actor.weight)
-        torch.nn.init.kaiming_normal_(self.fc2_actor.weight)
-        torch.nn.init.kaiming_normal_(self.fc3_actor_mean.weight)
+        for m in self.modules():
+            if type(m) is torch.nn.Linear:
+                torch.nn.init.normal_(m.weight)
+                torch.nn.init.zeros_(m.bias)
+        #torch.nn.init.kaiming_normal_(self.fc1_actor.weight)
+        #torch.nn.init.kaiming_normal_(self.fc2_actor.weight)
+        #torch.nn.init.kaiming_normal_(self.fc3_actor_mean.weight)
 
 
     def forward(self, x):
@@ -90,7 +94,7 @@ class ReinforceAgent(object):
 
         # compute discounted returns
         discounted_returns = discount_rewards(rewards, self.gamma)
-        # discounted_returns = discounted_returns.to(self.train_device).squeeze(-1)
+        discounted_returns = discounted_returns.to(self.train_device).view(-1)
         discounted_returns = (discounted_returns - discounted_returns.mean())/ discounted_returns.std()
         discounted_returns = discounted_returns - self.baseline
 
