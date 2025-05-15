@@ -37,10 +37,9 @@ class ReinforcePolicy(torch.nn.Module):
 
 
     def init_weights(self):
-        for m in self.modules():
-            if type(m) is torch.nn.Linear:
-                torch.nn.init.normal_(m.weight)
-                torch.nn.init.zeros_(m.bias)
+        torch.nn.init.kaiming_normal_(self.fc1_actor.weight)
+        torch.nn.init.kaiming_normal_(self.fc2_actor.weight)
+        torch.nn.init.kaiming_normal_(self.fc3_actor_mean.weight)
 
 
     def forward(self, x):

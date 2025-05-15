@@ -77,7 +77,7 @@ class MujocoEnv(gym.Env):
         self.observation_space = convert_observation_to_space(observation)
         return self.observation_space
 
-    def seed(self, seed=None):
+    def seed(self, seed=1):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
