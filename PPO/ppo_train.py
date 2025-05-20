@@ -102,8 +102,8 @@ def main():
     agent = PPO("MlpPolicy", train_env, verbose=1)
     callback = TrainTestCallback(model=agent, output_folder=output_folder, verbose=0)
 
-    mean_timestep_for_episodes = 103
-    agent.learn(total_timesteps=args.n_episodes*103, callback=callback)
+    mean_timestep_for_episodes = 300
+    agent.learn(total_timesteps=args.n_episodes*mean_timestep_for_episodes, callback=callback)
     agent.save("ppo_model.mdl")
 
 
