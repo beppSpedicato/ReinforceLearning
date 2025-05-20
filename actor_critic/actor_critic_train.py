@@ -11,30 +11,19 @@ import numpy as np
 from env.custom_hopper import *
 from actor_critic.actor_critic_agent import ActorCriticAgent, ActorCriticPolicy
 import matplotlib.pyplot as plt
-
+from utils.plot import plotAvgTxtFiles
+from utils.plot import plotTrainRewards
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--n-episodes', default=100000, type=int, help='Number of training episodes')
+    parser.add_argument('--n-episodes', default=14000, type=int, help='Number of training episodes')
     parser.add_argument('--print-every', default=2000, type=int, help='Print info every <> episodes')
     parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
     parser.add_argument('--baseline', default=0, type=int, help='baseline for reinforce update policy')
     parser.add_argument('--plot', default=True, type=bool, help='enable the creation of rewards plot')
 
     return parser.parse_args()
-
-def plotRewards (train_rewards):
-	plt.figure(figsize=(10, 5))
-	plt.plot(train_rewards, label='Train reward per episode')
-	plt.xlabel('Episode')
-	plt.ylabel('Reward')
-	plt.title('Training Rewards')
-	plt.legend()
-	plt.grid(True)
-	plt.tight_layout()
-	plt.savefig(f"train_rewards_actorcritic.png")
-	plt.close()
 
 args = parse_args()
 
@@ -83,7 +72,8 @@ def main():
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 
-	plotRewards(train_rewards)
+	plotTrainRewards(train_rewards, "actorcritic", 100)
+	plotAvgTxtFiles(["train_rewards_means_actorcritic.txt"], "actorcritic_avg")
 	torch.save(agent.policy.state_dict(), f"model_actorcritic_b{args.baseline}.mdl")  #riga modificata
 
 if __name__ == '__main__':

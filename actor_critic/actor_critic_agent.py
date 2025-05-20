@@ -119,20 +119,21 @@ class ActorCriticAgent(object):
     
         # Actor loss
         actor_loss = -torch.mean(action_log_probs * advantages.detach())
-        actor_loss.requires_grad_()
     
         # Critic loss
         critic_loss = F.mse_loss(state_values, targets.detach())
     
         # Total loss (optional: sum or weighted sum)
-        # total_loss = actor_loss + critic_loss
+        total_loss = actor_loss + critic_loss
+        total_loss.backward()
+        self.optimizer.step()
 
 
-        actor_loss.backward()
+        """ actor_loss.backward()
         self.optimizer.step()
 
         critic_loss.backward()
-        self.optimizer.step()
+        self.optimizer.step() """
     
         return        
 
