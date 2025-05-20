@@ -35,9 +35,9 @@ args = parse_args()
 
 
 def main():
-	random.seed(1)
-	np.random.seed(1)
-	torch.manual_seed(1)
+	random.seed(10)
+	np.random.seed(10)
+	torch.manual_seed(10)
 	env = gym.make('CustomHopper-source-v0')
 	# env = gym.make('CustomHopper-target-v0')
 
