@@ -72,7 +72,7 @@ class ActorCriticPolicy(torch.nn.Module):
 
 
 class ActorCriticAgent(object):
-    def __init__(self, policy, device='cpu', baseline=0):
+    def __init__(self, policy, device='cpu', alpha1 = 1, alpha2 = 1):
         self.train_device = device
         self.policy = policy.to(self.train_device)
         self.optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
@@ -84,7 +84,9 @@ class ActorCriticAgent(object):
         self.rewards = []
         self.done = []
 
-        self.baseline = baseline
+        self.alpha1 = alpha1
+        self.alpha2 = alpha2
+
 
 
     def update_policy(self):
@@ -124,7 +126,7 @@ class ActorCriticAgent(object):
         critic_loss = F.mse_loss(state_values, targets.detach())
     
         # Total loss (optional: sum or weighted sum)
-        total_loss = actor_loss + critic_loss
+        total_loss = self.alpha1*actor_loss + self.alpha2*critic_loss
         total_loss.backward()
         self.optimizer.step()
 

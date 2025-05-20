@@ -109,6 +109,8 @@ def main(baseline):
 	print('Action space:', env.action_space)
 	print('State space:', env.observation_space)
 	print('Dynamics parameters:', env.get_parameters())
+	print('Dynamics env.sim.model.body_names:', env.sim.model.body_names)
+    
 
 
 	"""
@@ -180,3 +182,9 @@ if __name__ == '__main__':
         'train_rewards_means_b85.txt'
     ]
     plot_multiple_baselines(files)
+
+
+    """ 
+        TODO: time consumption for episode and fot all the training
+        
+    """
