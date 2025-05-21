@@ -9,20 +9,21 @@ from env.custom_hopper import *
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.evaluation import evaluate_policy
+from PPO.ppo_utils import create_agent, train
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--n-episodes', default=14000, type=int, help='Number of training episodes')
-    parser.add_argument('--start-window', default=5000, type=int, help='Start window for mean calculation')
-    parser.add_argument('--end-window', default=9000, type=int, help='End window for mean calculation')
-    parser.add_argument('--n-trials', default=9000, type=int, help='Number of optimization trials')
+    parser.add_argument('--n-episodes', default=1400, type=int, help='Number of training episodes')
+    parser.add_argument('--mean-timestep', default=300, type=int, help='Mean number of timestep per episode')
+    parser.add_argument('--n-trials', default=50, type=int, help='Number of optimization trials')
+    parser.add_argument('--n-eval-episodes', default=1000, type=int, help='Number of eval episodes')
 
     return parser.parse_args()
 
 args = parse_args()
 
 class TrainOptimizeCallback(BaseCallback):
-
     def __init__(
         self,
         model: PPO,
@@ -73,45 +74,26 @@ class TrainOptimizeCallback(BaseCallback):
         return self.max_episode is None or len(self.train_rewards) < self.max_episode
         
     def _on_training_end(self):
-      pass
+        pass
 
 
-def train(clip_range, n_episodes):
-    # seed
-    random.seed(10)
-    np.random.seed(10)
-    torch.manual_seed(10)
-	
-    env = gym.make('CustomHopper-source-v0')
-    observation_space_dim = env.observation_space.shape[-1]
-    action_space_dim = env.action_space.shape[-1]
-
-    policy = PPO("MlpPolicy", env, clip_range=clip_range)
-
-    mean_timestep_for_episodes = 300
-    output_folder = f"./"
-    callback = TrainOptimizeCallback(model=policy, output_folder=output_folder)
-    policy.learn(total_timesteps=args.n_episodes*mean_timestep_for_episodes, callback=callback)
-
-
-
-def optimize_window_mean(clip_range, n_episodes, start=0, end=-1):
-    if (end == -1):
-        end = len(n_episodes)
-
-    train(clip_range, n_episodes)
-    window = train_rewards[start:end]
-    return sum(window) / len(window)
+def optimize_call(clip_range, n_episodes, n_eval_episodes):
+    env = "CustomHopper-source-v0"
+    train_env = gym.make(env)
+    
+    agent = create_agent(clip_range=clip_range)
+    train(agent, total_timestep=n_episodes) # todo: set appropriate number
+    
+    mean_reward, _ = evaluate_policy(agent, train_env, n_eval_episodes=n_eval_episodes)
+    return mean_reward
 
 
 def objective(trial):
     clip_range = trial.suggest_float("clip_range", 0.01, 0.3, log=True)
-
-    total_reward = optimize_window_mean(clip_range, args.n_episodes, start=args.start_window, end=args.end_window)
+    total_reward = optimize_call(clip_range, args.n_episodes*args.mean_timestep, args.n_eval_episodes)
 
     return total_reward
 	
-
 def main():
     study = optuna.create_study(direction="maximize")
     study.optimize(objective, n_trials=args.n_trials)
