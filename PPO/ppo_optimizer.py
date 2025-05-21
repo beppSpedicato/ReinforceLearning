@@ -23,60 +23,6 @@ def parse_args():
 
 args = parse_args()
 
-class TrainOptimizeCallback(BaseCallback):
-    def __init__(
-        self,
-        model: PPO,
-        output_folder: str,
-        test_env_path: str = None,
-        test_every: int = None,
-        max_episode: int = None,
-        verbose: int = 0
-    ):
-        super().__init__(verbose)
-        if test_env_path is not None:
-            self.test_env = gym.make(test_env_path)
-        else:
-            self.test_env = None
-        self.output_folder = output_folder
-        self.test_every = test_every
-        self.max_episode = max_episode
-
-        self.init_callback(model)
-
-
-    def _init_callback(self) -> None:
-        
-        self.train_rewards = []
-        self.train_episode_length = []
-
-        self.current_episode_length = 0
-        self.current_reward = 0
-    
-
-    def _on_step(self):
-        """Action to be done at each step."""
-
-        # Retrieve the data
-        reward = self.locals['rewards'][0] # float
-        done = self.locals['dones'][0] # bool
-
-        # Store them
-        self.current_reward += reward
-        self.current_episode_length += 1
-
-        if (done):
-            self.train_rewards.append(self.current_reward)
-            self.current_reward = 0
-            self.train_episode_length.append(self.current_episode_length)
-            self.current_episode_length = 0
-
-        return self.max_episode is None or len(self.train_rewards) < self.max_episode
-        
-    def _on_training_end(self):
-        pass
-
-
 def optimize_call(clip_range, n_episodes, n_eval_episodes):
     env = "CustomHopper-source-v0"
     train_env = gym.make(env)
