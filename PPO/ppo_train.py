@@ -37,8 +37,7 @@ def main():
 
     config = {
         "policy_type": "MlpPolicy",
-        # "total_timesteps": args.n_episodes*args.mean_timestep,
-        "total_timesteps": 100,
+        "total_timesteps": args.n_episodes*args.mean_timestep,
         "env_name": "CustomHopper-source-v0",
     }
 
@@ -66,9 +65,7 @@ def main():
         wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"{args.output_folder}/PPO_models/{run.id}", verbose=2)
         callbacks.append(wandb_callback)
         
-    learn = train(agent, callbacks=callbacks, total_timestep=config['total_timesteps'], model_output_path=f"{args.output_folder}/ppo_model.mdl")
-
-    print(learn.get_parameters())
+    train(agent, callbacks=callbacks, total_timestep=config['total_timesteps'], model_output_path=f"{args.output_folder}/ppo_model.mdl")
 
 
 if __name__ == '__main__':
