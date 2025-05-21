@@ -36,7 +36,8 @@ def create_agent(
     env: str="CustomHopper-source-v0",
     tensorboard_log: str=None,
     logEnv: bool=False,
-    clip_range: float=0.5 
+    clip_range: float=0.5 ,
+    verbose: int=1
 ):
     train_env = gym.make(env)
     if logEnv:
@@ -44,7 +45,7 @@ def create_agent(
         print('Action space:', train_env.action_space)  # action-space
         print('Dynamics parameters:', train_env.get_parameters())  # masses of each link of the Hopper
 
-    return PPO(policy_type, train_env, verbose=1, tensorboard_log=tensorboard_log, clip_range=clip_range)
+    return PPO(policy_type, train_env, verbose=verbose, tensorboard_log=tensorboard_log, clip_range=clip_range)
 
 """
 Create and initialize a PPO agent for a given environment.
