@@ -87,19 +87,20 @@ def main():
 	outputFolder = f"./trained-models/actorcritic_a1:{args.alpha1}_a2:{args.alpha2}"
 	if not os.path.exists(outputFolder):
 		os.mkdir(outputFolder)
+	print("Total training time: ", sum(time_consumings_per_episodes))
 
-  
+
 	plotTrainRewards(train_rewards, f"rewards_actorcritic", 100, y_label="Rewards per episode", outputFolder=outputFolder)
 	plotTrainRewards(
-     	timesteps, 
-     	f"timestep_actorcritic", 
-      	100, 
-       	chart_title="Timesteps per episode", 
-        create_txt=False,
-        outputFolder=outputFolder, 
-        label="Timestep per episodes",
-        y_label='Number of timesteps'
-    )
+	 	timesteps, 
+	 	f"timestep_actorcritic", 
+	  	100, 
+	   	chart_title="Timesteps per episode", 
+		create_txt=False,
+		outputFolder=outputFolder, 
+		label="Timestep per episodes",
+		y_label='Number of timesteps'
+	)
 	plotTrainRewards(
 		time_consumings_per_episodes, 
 	 	f"time_consuming_actorcritic",
@@ -109,10 +110,8 @@ def main():
 		y_label="Time (seconds)",
 		outputFolder=outputFolder,
 		label="Time consuming per episode"
-	)
-
-	print("Total training time: ", sum(time_consumings_per_episodes))
-	torch.save(agent.policy.state_dict(), f"{outputFolder}/model_actorcritic.mdl") 
+	) 
+	torch.save(agent.policy.state_dict(), f"{outputFolder}/model_actorcritic.mdl")
 
 if __name__ == '__main__':
 	main()
