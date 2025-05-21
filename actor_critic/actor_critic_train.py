@@ -110,6 +110,8 @@ def main():
 		outputFolder=outputFolder,
 		label="Time consuming per episode"
 	)
+
+	print("Total training time: ", sum(time_consumings_per_episodes))
 	torch.save(agent.policy.state_dict(), f"{outputFolder}/model_actorcritic.mdl") 
 
 if __name__ == '__main__':
