@@ -16,6 +16,9 @@ from stable_baselines3.common.evaluation import evaluate_policy
 import json
 from utils.plot import plotTrainRewards
 from utils.plot import plotAvgTxtFiles
+import wandb
+from wandb.integration.sb3 import WandbCallback
+from stable_baselines3.common.callbacks import CallbackList
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -88,23 +91,38 @@ def main():
     random.seed(1)
     np.random.seed(1)
     torch.manual_seed(1)
+    mean_timestep_for_episodes = 300
+
+
+    config = {
+        "policy_type": "MlpPolicy",
+        "total_timesteps": args.n_episodes*mean_timestep_for_episodes,
+        "env_name": "CustomHopper-source-v0",
+    }
     
-    train_env = gym.make('CustomHopper-source-v0')
+    run = wandb.init(
+        project="sb3",
+        config=config,
+        sync_tensorboard=True,
+        monitor_gym=True,
+        save_code=True,
+    )
+    
+    train_env = gym.make(config['env_name'])
 
     print('State space:', train_env.observation_space)  # state-space
     print('Action space:', train_env.action_space)  # action-space
     print('Dynamics parameters:', train_env.get_parameters())  # masses of each link of the Hopper
 
-    #
-    # TASK 4 & 5: train and test policies on the Hopper env with stable-baselines3
-    #
-    output_folder = f"./"
-    agent = PPO("MlpPolicy", train_env, verbose=1)
-    callback = TrainTestCallback(model=agent, output_folder=output_folder, verbose=0)
+    output_folder = f"./PPO_output"
+    agent = PPO(config['policy_type'], train_env, verbose=1, tensorboard_log=f"PPO_output/PPO_runs/{run.id}")
+    
+    train_test_callback = TrainTestCallback(model=agent, output_folder=output_folder, verbose=0)
+    wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"PPO_output/PPO_models/{run.id}", verbose=2)
+    callbacks = CallbackList([train_test_callback, wandb_callback])
 
-    mean_timestep_for_episodes = 300
-    agent.learn(total_timesteps=args.n_episodes*mean_timestep_for_episodes, callback=callback)
-    agent.save("ppo_model.mdl")
+    agent.learn(total_timesteps=config['total_timesteps'], callback=callbacks)
+    agent.save("PPO_output/ppo_model.mdl")
 
 
 if __name__ == '__main__':

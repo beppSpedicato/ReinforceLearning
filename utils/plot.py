@@ -6,10 +6,15 @@ def plotTrainRewards(
 	train_rewards: list,
 	title: str,
 	window_size: int,
-	create_txt: bool = True
+	create_txt: bool = True,
+	chart_title: str = "Training rewards",
+	x_label: str = "Episodes",
+	y_label: str = "Reward",
+	outputFolder: str = "./",
+	label: str = "Train reward per episode"
 ): 
 	plt.figure(figsize=(10, 5))
-	plt.plot(train_rewards, label='Train reward per episode')
+	plt.plot(train_rewards, label=label)
 
 	means = []
 	positions = []
@@ -17,28 +22,33 @@ def plotTrainRewards(
 		window = train_rewards[i:i+window_size]
 		mean_value = np.mean(window)
 		means.append(mean_value)
-		positions.append(i + window_size//2)  # centro della finestra
-
-	# Tracciare la linea delle medie
+		positions.append(i + window_size//2)
+  
 	plt.plot(positions, means, color='red', label=f'Average every {window_size} episodes', linewidth=2)
 
-	plt.xlabel('Episode')
-	plt.ylabel('Reward')
-	plt.title('Training Rewards')
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+	plt.title(chart_title)
 	plt.legend()
 	plt.grid(True)
 	plt.tight_layout()
-	plt.savefig(f"train_rewards_{title}.png")
+	plt.savefig(f"{outputFolder}/train_{title}.png")
 	plt.close()
 
 	if (create_txt):
-		filename = f"train_rewards_means_{title}.txt"
+		filename = f"{outputFolder}/train_means_{title}.txt"
 		with open(filename, 'w') as f:
 			f.write(f"{title}\n")
 			for mean_value in means:
 				f.write(f"{mean_value}\n")
 
-def plotAvgTxtFiles(file_list, merge_title):
+def plotAvgTxtFiles(
+    file_list, 
+    merge_title,
+	x_label: str = 'Window index (every 500 episodes)',
+	y_label: str = 'Mean reward',
+	title: str = 'Mean rewards for each baselines'
+):
 	plt.figure(figsize=(12, 6))
 
 	for filename in file_list:
@@ -50,9 +60,9 @@ def plotAvgTxtFiles(file_list, merge_title):
 		x = [i for i in range(len(means))]
 		plt.plot(x, means, marker='o', label=baseline)
 
-	plt.xlabel('Window index (ogni 500 episodi)')
-	plt.ylabel('Media reward')
-	plt.title('Confronto medie reward per baseline')
+	plt.xlabel(x_label)
+	plt.ylabel(y_label)
+	plt.title(title)
 	plt.legend()
 	plt.grid(True)
 	plt.tight_layout()

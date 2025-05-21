@@ -1,0 +1,16 @@
+Prova: ottimizzare actor_critic basandoci sul reward medio in una determinata window di episodi
+    -> window: 5000 - 9000
+    -> risultato migliore per ora:
+        417.28653495942586 and parameters: {'alpha1': 0.013396063146884157, 'alpha2': 0.009748205129440874}
+
+Rispetto a reinforce, ha una velocità di convergenza maggiore, con un picco a metà train (circa nella window creata per l'ottimizzazione)
+
+Tune:
+Abbiamo provato a pesare le perdite della parte critic e della parte actor, in modo da privileggiare il contributo di una rispetto all'altra o da modulare la somma totale del loss.
+Per farlo, abbiamo utilizzato optuna e abbiamo ottimizzato cercando di massimizzare la somma dei rewards in una determinata window di episodi; abbiamo scelto una window centrale (tra 5000, 9000)
+in modo da alzare il punto di convergenza medio dei reward. 
+
+Rispetto alla versione senza pesi per i loss (alpha1 ed alpha2 settati ad 1), vediamo una curva più alta, e un reward massimo molto più alto. 
+
+- step
+    time consuming sia optimize che 

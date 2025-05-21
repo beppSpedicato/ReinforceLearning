@@ -2,6 +2,7 @@
 	REINFORCE 
 """
 import argparse
+import os
 
 import torch
 import gym
@@ -18,8 +19,8 @@ import time
 
 def parse_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--n-episodes', default=14000, type=int, help='Number of training episodes')
-	parser.add_argument('--print-every', default=2000, type=int, help='Print info every <> episodes')
+	parser.add_argument('--n-episodes', default=1400, type=int, help='Number of training episodes')
+	parser.add_argument('--print-every', default=200, type=int, help='Print info every <> episodes')
 	parser.add_argument('--device', default='cpu', type=str, help='network device [cpu, cuda]')
 	parser.add_argument('--plot', default=True, type=bool, help='enable the creation of rewards plot')
 
@@ -87,13 +88,35 @@ def main(baseline):
 			print('Training episode:', episode)
 			print('Episode return:', train_reward)
 			print('Time consuming: ', time_consuming)
-			 
-	plotTrainRewards(train_rewards, f"reinforce_b{baseline}", 100)
-	plotTrainRewards(timesteps, f"timestep_reinforce_b{baseline}", 100, create_txt=False)
-	plotTrainRewards(time_consumings_per_episodes, f"time_consuming_reinforce_b{baseline}", 100, create_txt=False)
+
+	outputFolder = f"./trained-models/reinforce_b{baseline}"
+	if not os.path.exists(outputFolder):
+		os.mkdir(outputFolder)
+ 
+	plotTrainRewards(train_rewards, f"rewards_reinforce_b{baseline}", 100, y_label="Rewards per episode", outputFolder=outputFolder)
+	plotTrainRewards(
+     	timesteps, 
+     	f"timestep_reinforce_b{baseline}", 
+      	100, 
+       	chart_title="Timesteps per episode", 
+        create_txt=False, 
+        outputFolder=outputFolder, 
+        label="Timestep per episodes",
+        y_label='Number of timesteps'
+    )
+	plotTrainRewards(
+		time_consumings_per_episodes, 
+	 	f"time_consuming_reinforce_b{baseline}",
+	  	100, 
+	   	create_txt=False,
+		chart_title="Time consuming in seconds",
+		y_label="Time (seconds)",
+		outputFolder=outputFolder,
+		label="Time consuming per episode"
+	)
 
 	print("Total training time: ", sum(time_consumings_per_episodes))
-	torch.save(agent.policy.state_dict(), f"model_reinforce_b{baseline}.mdl")  #riga modificata
+	torch.save(agent.policy.state_dict(), f"{outputFolder}/model_reinforce_b{baseline}.mdl")  #riga modificata
 
 	
 
