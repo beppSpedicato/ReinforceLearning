@@ -95,15 +95,15 @@ def main(baseline):
  
 	plotTrainRewards(train_rewards, f"rewards_reinforce_b{baseline}", 100, y_label="Rewards per episode", outputFolder=outputFolder)
 	plotTrainRewards(
-     	timesteps, 
-     	f"timestep_reinforce_b{baseline}", 
-      	100, 
-       	chart_title="Timesteps per episode", 
-        create_txt=False, 
-        outputFolder=outputFolder, 
-        label="Timestep per episodes",
-        y_label='Number of timesteps'
-    )
+	 	timesteps, 
+	 	f"timestep_reinforce_b{baseline}", 
+	  	100, 
+	   	chart_title="Timesteps per episode", 
+		create_txt=False, 
+		outputFolder=outputFolder, 
+		label="Timestep per episodes",
+		y_label='Number of timesteps'
+	)
 	plotTrainRewards(
 		time_consumings_per_episodes, 
 	 	f"time_consuming_reinforce_b{baseline}",
@@ -134,16 +134,11 @@ if __name__ == '__main__':
 	print("baseline 85")
 	main(85)
 	files = [
-		'train_rewards_means_b0.txt', 
-		'train_rewards_means_b5.txt', 
-		'train_rewards_means_b10.txt', 
-		'train_rewards_means_b20.txt', 
-		'train_rewards_means_b50.txt', 
-		'train_rewards_means_b85.txt'
+		f'./trained-models/reinforce_b0/train_rewards_means_b0.txt', 
+		f'./trained-models/reinforce_b5/train_rewards_means_b5.txt', 
+		f'./trained-models/reinforce_b10/train_rewards_means_b10.txt', 
+		f'./trained-models/reinforce_b20/train_rewards_means_b20.txt', 
+		f'./trained-models/reinforce_b50/train_rewards_means_b50.txt', 
+		f'./trained-models/reinforce_b85/train_rewards_means_b85.txt'
 	]
 	plotAvgTxtFiles(files,  "reinforce")
-
-
-	""" 
-		TODO: time consumption for episode and fot all the training
-	"""
