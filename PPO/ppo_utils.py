@@ -36,7 +36,7 @@ def create_agent(
     env: str="CustomHopper-source-v0",
     tensorboard_log: str=None,
     logEnv: bool=False,
-    clip_range: float=0.5 ,
+    clip_range: float=-1,
     verbose: int=1
 ):
     train_env = gym.make(env)
@@ -45,6 +45,9 @@ def create_agent(
         print('Action space:', train_env.action_space)  # action-space
         print('Dynamics parameters:', train_env.get_parameters())  # masses of each link of the Hopper
 
+    if clip_range < 0:
+        return PPO(policy_type, train_env, verbose=verbose, tensorboard_log=tensorboard_log)
+    
     return PPO(policy_type, train_env, verbose=verbose, tensorboard_log=tensorboard_log, clip_range=clip_range)
 
 """
@@ -141,5 +144,5 @@ class TrainTestCallback(BaseCallback):
         
     def _on_training_end(self):
         print(sum(self.train_episode_length) / len(self.train_episode_length))
-        plotTrainRewards(self.train_rewards, "ppo", 10, outputFolder=self.output_folder)
-        plotAvgTxtFiles([f"{self.output_folder}/train_means_ppo.txt"], "PPO_AVG_100_episodes")
+        plotTrainRewards(self.train_rewards, "ppo", 100, outputFolder=self.output_folder)
+        plotAvgTxtFiles([f"{self.output_folder}/train_means_ppo.txt"], f"{self.output_folder}/PPO_AVG_100_episodes")
