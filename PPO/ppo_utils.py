@@ -12,6 +12,7 @@ from utils.plot import plotAvgTxtFiles
 import wandb
 from wandb.integration.sb3 import WandbCallback
 from stable_baselines3.common.callbacks import CallbackList
+from stable_baselines3.common.evaluation import evaluate_policy
 
 """
 Create and initialize a PPO agent for a given environment.
@@ -107,11 +108,16 @@ class TrainTestCallback(BaseCallback):
         model: PPO,
         output_folder: str,
         max_episode: int = None,
-        verbose: int = 0
+        verbose: int = 0,
+        test_window: int = 20,
+        test_env: str = "CustomHopper-source-v0"
     ):
         super().__init__(verbose)
         self.output_folder = output_folder
         self.max_episode = max_episode
+        self.test_window = test_window
+        self.test_env_label = test_env
+        self.test_env = gym.make(test_env)
 
         self.init_callback(model)
 
@@ -122,15 +128,14 @@ class TrainTestCallback(BaseCallback):
 
         self.current_episode_length = 0
         self.current_reward = 0
+        self.test_counter = 0
+        self.test_rewards = []
 
     def _on_step(self):
         """Action to be done at each step."""
-
-        # Retrieve the data
         reward = self.locals['rewards'][0] # float
         done = self.locals['dones'][0] # bool
 
-        # Store them
         self.current_reward += reward
         self.current_episode_length += 1
 
@@ -139,10 +144,33 @@ class TrainTestCallback(BaseCallback):
             self.current_reward = 0
             self.train_episode_length.append(self.current_episode_length)
             self.current_episode_length = 0
+            self.test_counter += 1
+
+            if self.test_window is not None and self.test_counter == self.test_window - 1:
+                test_reward, _ = evaluate_policy(self.model, self.test_env, n_eval_episodes=self.test_window)
+                self.test_rewards.append(test_reward)
+                self.test_counter = 0
 
         return self.max_episode is None or len(self.train_rewards) < self.max_episode
         
     def _on_training_end(self):
+        print("mean episode length")
         print(sum(self.train_episode_length) / len(self.train_episode_length))
+
+        print("mean train reward")
+        print(sum(self.train_rewards) / len(self.train_rewards))
+
+        print("mean test reward")
+        print(sum(self.test_rewards) / len(self.test_rewards))
+        
         plotTrainRewards(self.train_rewards, "ppo", 100, outputFolder=self.output_folder)
         plotAvgTxtFiles([f"{self.output_folder}/train_means_ppo.txt"], f"{self.output_folder}/PPO_AVG_100_episodes")
+
+        if self.test_window is not None:
+            filename = f"{self.output_folder}/test_rewards_{self.test_env_label}.txt"
+            with open(filename, 'w') as f:
+                for mean_value in self.test_rewards:
+                    f.write(f"{mean_value}\n")
+
+            print("test rewards file: " + filename)
+            

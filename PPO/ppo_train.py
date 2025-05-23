@@ -72,7 +72,7 @@ def main():
 	)
 
 	# define callback instances
-	callbacks = [TrainTestCallback(model=agent, output_folder=output_folder, verbose=0)]
+	callbacks = [TrainTestCallback(model=agent, output_folder=output_folder, verbose=0, test_window=None)]
 	if args.use_wandb:
 		wandb_callback = WandbCallback(gradient_save_freq=100, model_save_path=f"{output_folder}/PPO_models/{run.id}", verbose=2)
 		callbacks.append(wandb_callback)
