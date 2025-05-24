@@ -20,7 +20,7 @@ class UDRCallback(BaseCallback):
 	def _on_step(self):
 		done = self.locals['dones'][0] 
 		if done:
-			self.training_env.envs[0].udr_sample_parameters(self.delta, log=(self.verbose==1))
+			self.training_env.envs[0].udr_sample_parameters(delta=self.delta, log=(self.verbose==1))
 
 		return True
 
@@ -52,7 +52,7 @@ def train_test_ppo_with_udr (
 			output_folder,
 			test_env=test_env
 		),
-		UDRCallback(agent, delta)
+		UDRCallback(agent, delta=delta)
 	]
   
 	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
