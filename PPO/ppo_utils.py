@@ -1,16 +1,9 @@
 import gym
 from env.custom_hopper import *
 from stable_baselines3 import PPO
-import argparse
-import torch
-import random
-import numpy as np
 from stable_baselines3.common.callbacks import BaseCallback
-import json
 from utils.plot import plotTrainRewards
 from utils.plot import plotAvgTxtFiles
-import wandb
-from wandb.integration.sb3 import WandbCallback
 from stable_baselines3.common.callbacks import CallbackList
 from stable_baselines3.common.evaluation import evaluate_policy
 
@@ -110,7 +103,7 @@ class TrainTestCallback(BaseCallback):
         max_episode: int = None,
         verbose: int = 0,
         test_window: int = 20,
-        test_env: str = "CustomHopper-source-v0"
+        test_env: str = "CustomHopper-source-v0",
     ):
         super().__init__(verbose)
         self.output_folder = output_folder
@@ -160,13 +153,12 @@ class TrainTestCallback(BaseCallback):
         print("mean train reward")
         print(sum(self.train_rewards) / len(self.train_rewards))
 
-        print("mean test reward")
-        print(sum(self.test_rewards) / len(self.test_rewards))
-        
         plotTrainRewards(self.train_rewards, "ppo", 100, outputFolder=self.output_folder)
         plotAvgTxtFiles([f"{self.output_folder}/train_means_ppo.txt"], f"{self.output_folder}/PPO_AVG_100_episodes")
 
         if self.test_window is not None:
+            print("mean test reward")
+            print(sum(self.test_rewards) / len(self.test_rewards))
             filename = f"{self.output_folder}/test_rewards_{self.test_env_label}.txt"
             with open(filename, 'w') as f:
                 for mean_value in self.test_rewards:

@@ -16,33 +16,38 @@ class CustomHopper(MujocoEnv, utils.EzPickle):
         MujocoEnv.__init__(self, 4)
         utils.EzPickle.__init__(self)
 
-        self.original_masses = np.copy(self.sim.model.body_mass[1:])    # Default link masses
+        self.original_masses = np.copy(self.sim.model.body_mass)    # Default link masses
 
         if domain == 'source':  # Source environment has an imprecise torso mass (-30% shift)
             self.sim.model.body_mass[1] *= 0.7
 
-    def set_random_parameters(self):
-        """Set random masses"""
-        self.set_parameters(self.sample_parameters())
-
-
-    def sample_parameters(self):
+    def udr_sample_parameters(self, delta, log: False):
         """Sample masses according to a domain randomization distribution"""
+        old_masses = np.copy(self.sim.model.body_mass)
+        body_masses = self.original_masses
+        parameters = body_masses[2:]
         
-        #
-        # TASK 6: implement domain randomization. Remember to sample new dynamics parameter
-        #         at the start of each training episode.
-        
-        raise NotImplementedError()
+        # get upper and lower using a delta parameter for masses
+        upper_bounds = (1 + delta)*parameters
+        lower_bounds = (1 - delta)*parameters
 
+        if log:
+            print(upper_bounds, lower_bounds)
+
+        # calculate uniform parameters
+        new_parameters = np.random.uniform(lower_bounds, upper_bounds)
+        self.sim.model.body_mass[2:] = new_parameters
+        
+        if log:
+            print("Old parameters: ", old_masses)
+            print("New parameters: ", self.sim.model.body_mass)
+            
         return
-
 
     def get_parameters(self):
         """Get value of mass for each link"""
         masses = np.array( self.sim.model.body_mass[1:] )
         return masses
-
 
     def set_parameters(self, task):
         """Set each hopper link's mass to a new value"""

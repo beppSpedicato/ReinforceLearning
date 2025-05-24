@@ -1,5 +1,4 @@
 """Test an RL agent on the OpenAI Gym Hopper environment"""
-import argparse
 import os
 import random
 
@@ -40,7 +39,7 @@ def train_and_test_policy (
 			test_env=test_env
 		)
 	]
-
+  
 	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
 
 	
