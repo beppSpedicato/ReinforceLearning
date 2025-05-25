@@ -38,7 +38,8 @@ def train_test_ppo_with_udr (
 	torch.manual_seed(10)
  
 	if not os.path.exists(output_folder):
-		os.mkdir(output_folder)
+		os.makedirs(output_folder)
+
   
 	agent = create_agent(
 		env=train_env,
