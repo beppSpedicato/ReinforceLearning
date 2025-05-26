@@ -17,7 +17,8 @@ def train_and_test_policy (
 	episodes: int = 14000,
 	timesteps: int = 300,
 	output_folder: str = './PPO_output/target-target/',
-	clip_range: float = -1
+	clip_range: float = -1,
+	print_std_deviation: bool = False
 ):
 	random.seed(10)
 	np.random.seed(10)
@@ -36,7 +37,8 @@ def train_and_test_policy (
 		TrainTestCallback(
 			agent,
 			output_folder,
-			test_env=test_env
+			test_env=test_env,
+			print_test_std=print_std_deviation
 		)
 	]
   

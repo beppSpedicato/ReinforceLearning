@@ -31,7 +31,8 @@ def train_test_ppo_with_udr (
 	clip_range: float = -1,
 	episodes: int = 8000,
 	timesteps: int = 300,
-	delta: int = 1
+	delta: int = 1,
+	print_std_deviation: bool = False
 ):
 	random.seed(10)
 	np.random.seed(10)
@@ -51,7 +52,8 @@ def train_test_ppo_with_udr (
 		TrainTestCallback(
 			agent,
 			output_folder,
-			test_env=test_env
+			test_env=test_env,
+			print_test_std=print_std_deviation
 		),
 		UDRCallback(agent, delta=delta)
 	]

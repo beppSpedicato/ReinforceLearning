@@ -104,6 +104,7 @@ class TrainTestCallback(BaseCallback):
         verbose: int = 0,
         test_window: int = 20,
         test_env: str = "CustomHopper-source-v0",
+        print_test_std: bool = False
     ):
         super().__init__(verbose)
         self.output_folder = output_folder
@@ -111,6 +112,7 @@ class TrainTestCallback(BaseCallback):
         self.test_window = test_window
         self.test_env_label = test_env
         self.test_env = gym.make(test_env)
+        self.print_test_std = print_test_std
 
         self.init_callback(model)
 
@@ -123,6 +125,7 @@ class TrainTestCallback(BaseCallback):
         self.current_reward = 0
         self.test_counter = 0
         self.test_rewards = []
+        self.test_std = []
 
     def _on_step(self):
         """Action to be done at each step."""
@@ -140,8 +143,9 @@ class TrainTestCallback(BaseCallback):
             self.test_counter += 1
 
             if self.test_window is not None and self.test_counter == self.test_window - 1:
-                test_reward, _ = evaluate_policy(self.model, self.test_env, n_eval_episodes=self.test_window)
+                test_reward, test_std = evaluate_policy(self.model, self.test_env, n_eval_episodes=self.test_window)
                 self.test_rewards.append(test_reward)
+                self.test_std.append(test_std)
                 self.test_counter = 0
 
         return self.max_episode is None or len(self.train_rewards) < self.max_episode
@@ -165,4 +169,8 @@ class TrainTestCallback(BaseCallback):
                     f.write(f"{mean_value}\n")
 
             print("test rewards file: " + filename)
+
+            if self.print_test_std:
+                print("mean test std")
+                print(sum(self.test_std) / len(self.test_std))
             
