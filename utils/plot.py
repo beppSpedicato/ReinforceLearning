@@ -68,3 +68,47 @@ def plotAvgTxtFiles(
 	plt.tight_layout()
 	plt.savefig(f"{merge_title}.png")
 	plt.close()
+
+
+
+def plot_multiple_baselines(file_list):
+    plt.figure(figsize=(12, 6))
+
+    for filename in file_list:
+        with open(filename, 'r') as f:
+            lines = f.readlines()
+            baseline = lines[0].strip()
+            means = [float(line.strip()) for line in lines[1:]]
+
+        window_size = 500
+        x_labels = [f"{i * window_size + 1}-{(i + 1) * window_size}" for i in range(len(means))]
+
+        # Plot means (x is implicit: 0, 1, 2, ...)
+        plt.plot(means, marker='o', label=baseline)
+
+        # Show only every 10th x label
+        step = 1
+        ticks_to_show = range(0, len(x_labels), step)
+        plt.xticks(
+            ticks=ticks_to_show,
+            labels=[x_labels[i] for i in ticks_to_show],
+            rotation=45,
+            fontsize=8
+        )
+
+    plt.xlabel('Episode Windows')
+    plt.ylabel('Mean Cumulated Reward')
+    plt.title('Mean of Cumulated rewards over 100 episodes')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig("train_rewards_reinforce.png")
+    plt.close()
+
+files = [
+        'train_rewards_means_b0.txt',
+        'train_rewards_means_b20.txt',
+        'train_rewards_means_b50.txt'
+]
+
+(plot_multiple_baselines(files))
