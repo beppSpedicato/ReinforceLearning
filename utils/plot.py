@@ -71,7 +71,7 @@ def plotAvgTxtFiles(
 
 
 
-def plot_multiple_baselines(file_list):
+def plot_multiplethings_window(file_list):
     plt.figure(figsize=(12, 6))
 
     for filename in file_list:
