@@ -158,8 +158,7 @@ class TrainTestCallback(BaseCallback):
         print(sum(self.train_rewards) / len(self.train_rewards))
 
         plotTrainRewards(self.train_rewards, "ppo", 100, outputFolder=self.output_folder)
-        plotAvgTxtFiles([f"{self.output_folder}/train_means_ppo.txt"], f"{self.output_folder}/PPO_AVG_100_episodes")
-
+       
         if self.test_window is not None:
             print("mean test reward")
             print(sum(self.test_rewards) / len(self.test_rewards))
