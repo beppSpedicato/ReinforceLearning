@@ -1,6 +1,7 @@
 """Test an RL agent on the OpenAI Gym Hopper environment"""
 import os
 import random
+import time
 
 from PPO.ppo_utils import TrainTestCallback, create_agent, train
 import torch
@@ -79,7 +80,10 @@ def test_ppo_policy(
 
 			state, reward, done, info = env.step(action)
 
+
+
 			if render:
+				time.sleep(0.02)
 				env.render()
 
 			test_reward += reward

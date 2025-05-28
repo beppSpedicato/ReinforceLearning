@@ -23,8 +23,7 @@ def parse_args():
 
 args = parse_args()
 
-def optimize_call(clip_range, n_episodes, n_eval_episodes):
-    env = "CustomHopper-source-v0"
+def optimize_call(clip_range, n_episodes, n_eval_episodes, env: str = "CustomHopper-source-v0"):
     train_env = gym.make(env)
     
     agent = create_agent(clip_range=clip_range, verbose=0)
