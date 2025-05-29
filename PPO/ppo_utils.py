@@ -31,6 +31,8 @@ def create_agent(
     tensorboard_log: str=None,
     logEnv: bool=False,
     clip_range: float=-1,
+    gamma: float = 0.99,
+    learning_rate=1e-3,
     verbose: int=1
 ):
     train_env = gym.make(env)
@@ -42,7 +44,15 @@ def create_agent(
     if clip_range < 0:
         return PPO(policy_type, train_env, verbose=verbose, tensorboard_log=tensorboard_log)
     
-    return PPO(policy_type, train_env, verbose=verbose, tensorboard_log=tensorboard_log, clip_range=clip_range)
+    return PPO(
+        policy_type, 
+        train_env, 
+        verbose=verbose, 
+        tensorboard_log=tensorboard_log, 
+        clip_range=clip_range,
+        gamma=gamma,
+        learning_rate=learning_rate
+    )
 
 """
 Create and initialize a PPO agent for a given environment.
