@@ -19,6 +19,8 @@ def train_and_test_policy (
 	timesteps: int = 300,
 	output_folder: str = './PPO_output/target-target/',
 	clip_range: float = -1,
+	learning_rate: float = 1e-3,
+	gamma: float = 0.99,
 	print_std_deviation: bool = False
 ):
 	random.seed(10)
@@ -31,7 +33,9 @@ def train_and_test_policy (
 	agent = create_agent(
 		env=train_env,
 		verbose=0,
-		clip_range=clip_range
+		clip_range=clip_range,
+		learning_rate=learning_rate,
+		gamma=gamma,
 	)
 
 	callbacks = [
