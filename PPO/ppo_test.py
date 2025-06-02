@@ -21,11 +21,12 @@ def train_and_test_policy (
 	clip_range: float = -1,
 	learning_rate: float = 1e-3,
 	gamma: float = 0.99,
-	print_std_deviation: bool = False
+	print_std_deviation: bool = False,
+	seed: int = 10
 ):
-	random.seed(10)
-	np.random.seed(10)
-	torch.manual_seed(10)
+	random.seed(seed)
+	np.random.seed(seed)
+	torch.manual_seed(seed)
  
 	if not os.path.exists(output_folder):
 		os.makedirs(output_folder)
@@ -56,11 +57,12 @@ def test_ppo_policy(
 	test_env: str = 'CustomHopper-target-v0',
 	model: str = "ppo_model.mdl",
 	episodes: int = 1000,
-	render: bool = False
+	render: bool = False,
+	seed: int = 10
 ):
-	random.seed(10)
-	np.random.seed(10)
-	torch.manual_seed(10)
+	random.seed(seed)
+	np.random.seed(seed)
+	torch.manual_seed(seed)
 	env = gym.make(test_env)
 
 	print('Action space:', env.action_space)
