@@ -26,6 +26,7 @@ def parse_args():
 	parser.add_argument('--mean-timestep', default=300, type=int, help="mean number of timestep per episode")
 	parser.add_argument('--output-folder', default="./PPO_output", type=str, help="Output path for models and charts")
 	parser.add_argument('--clip-range', default=-1, type=float, help="Clip range (if negative it is not setted)")
+	parser.add_argument('--seed', default=10, type=int, help="selct the starting seed")
 
 	return parser.parse_args()
 
@@ -33,9 +34,9 @@ args = parse_args()
 	
 	
 def main():
-	random.seed(10)
-	np.random.seed(10)
-	torch.manual_seed(10)
+	random.seed(args.seed)
+	np.random.seed(args.seed)
+	torch.manual_seed(args.seed)
 	config = {
 		"policy_type": "MlpPolicy",
 		"total_timesteps": args.n_episodes*args.mean_timestep,
