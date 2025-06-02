@@ -26,8 +26,10 @@ def parse_args():
 	parser.add_argument('--mean-timestep', default=300, type=int, help="mean number of timestep per episode")
 	parser.add_argument('--output-folder', default="./PPO_output", type=str, help="Output path for models and charts")
 	parser.add_argument('--clip-range', default=-1, type=float, help="Clip range (if negative it is not setted)")
-	parser.add_argument('--seed', default=10, type=int, help="selct the starting seed")
-
+	parser.add_argument('--seed', default=10, type=int, help="select the starting seed")
+	parser.add_argument('--learning_rate', default=1e-3, type=int, help="learning rate")
+	parser.add_argument('--gamma', default=0.99, type=int, help="discount factor")
+	
 	return parser.parse_args()
 
 args = parse_args()
@@ -70,6 +72,8 @@ def main():
 		env=config['env_name'],
 		tensorboard_log=tensorboard_log,
 		clip_range=args.clip_range
+		learning_rate=args.learning_rate,
+		gamma=args.gamma,
 	)
 
 	# define callback instances
