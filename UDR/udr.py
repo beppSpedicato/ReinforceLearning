@@ -34,11 +34,12 @@ def train_test_ppo_with_udr (
     gamma: float = 0.99,
     learning_rate=1e-3,
 	delta: int = 1,
-	print_std_deviation: bool = False
+	print_std_deviation: bool = False,
+	seed: int = 10
 ):
-	random.seed(10)
-	np.random.seed(10)
-	torch.manual_seed(10)
+	random.seed(seed)
+	np.random.seed(seed)
+	torch.manual_seed(seed)
  
 	if not os.path.exists(output_folder):
 		os.makedirs(output_folder)
