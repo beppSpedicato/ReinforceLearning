@@ -48,7 +48,7 @@ def train_and_test_policy (
 		)
 	]
   
-	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
+	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=f"{output_folder}/ppo_model.mdl")
 
 	
 
