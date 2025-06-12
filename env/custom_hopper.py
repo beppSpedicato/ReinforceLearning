@@ -44,6 +44,40 @@ class CustomHopper(MujocoEnv, utils.EzPickle):
             
         return
 
+    def get_masses_ranges(self, delta):
+        body_masses = self.original_masses
+        parameters = body_masses[2:]
+        upper_bounds = (1 + delta)*parameters
+        lower_bounds = (1 - delta)*parameters
+
+        return list(zip(lower_bounds, upper_bounds))
+
+        
+
+    def beta_sample_parameters(self, a, b, delta, log: False):
+        """Sample masses according to a domain randomization distribution"""
+        old_masses = np.copy(self.sim.model.body_mass)
+        body_masses = self.original_masses
+        parameters = body_masses[2:]
+        
+        # get upper and lower using a delta parameter for masses
+        upper_bounds = (1 + delta)*parameters
+        lower_bounds = (1 - delta)*parameters
+
+        if log:
+            print(upper_bounds, lower_bounds)
+            
+        samples = np.random.beta(a, b)
+        new_parameters = samples * (upper_bounds - lower_bounds) + lower_bounds
+            
+        self.sim.model.body_mass[2:] = new_parameters
+        
+        if log:
+            print("Old parameters: ", old_masses)
+            print("New parameters: ", self.sim.model.body_mass)
+            
+        return self.sim.model.body_mass[2:]
+
     def get_parameters(self):
         """Get value of mass for each link"""
         masses = np.array( self.sim.model.body_mass[1:] )
