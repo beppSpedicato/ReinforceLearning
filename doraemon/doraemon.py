@@ -205,27 +205,3 @@ def train_test_ppo_with_doraemon (
 	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
 
 
-n_episodes = 4000
-mean_timestep = 300
-target_env = "CustomHopper-target-v0"
-source_env = "CustomHopper-source-v0"
-
-# optimized for PPO without UDR in source environment
-optimized_clip_range = 0.19877024509129543
-optimized_learning_rate = 0.0008
-optimized_gamma = 0.992
-seed=40
-
-train_test_ppo_with_doraemon(
-	output_folder="doraemon-out",
-	train_env=source_env,
-	test_env=target_env,
-	episodes=n_episodes,
-	clip_range=optimized_clip_range,
-	learning_rate=optimized_learning_rate,
-	gamma=optimized_gamma,
-	timesteps=mean_timestep,
-	print_std_deviation=True,
-	seed=seed,
-)
-
