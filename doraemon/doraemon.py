@@ -13,13 +13,14 @@ class DoraemonCallback(BaseCallback):
 		self,
 		model: PPO,
 		verbose: int = 0,
-		delta: float = 1,
+		delta: float = 0.5,
 		a: list = [100, 100, 100],
 		b: list = [100, 100, 100],
 		K: int = 20,
 		alpha: float = 0.5,
-		success_threeshold: int = 1400,
-        epsilon: float = 0.01,
+        epsilon: float = 0.05,
+        step: float = 2.0,
+		success_threeshold: int = 1600,
 	):
 		self.delta = delta
 		self.a = a
@@ -31,6 +32,7 @@ class DoraemonCallback(BaseCallback):
 		self.alpha = alpha
 		self.success_threeshold = success_threeshold
 		self.epsilon = epsilon
+		self.step = step
   
 		super().__init__(verbose)
 		self.init_callback(model)
@@ -51,6 +53,8 @@ class DoraemonCallback(BaseCallback):
 			# Quando ho K traiettorie
 			if len(self.trajectories) >= self.K:
 				G_ha = self.estimate_success_rate(self.a, self.b, self.a, self.b)
+				if (G_ha > 0 and self.verbose == 1):
+					print(G_ha)
 
 				if (G_ha < self.alpha):
 					# se minore di alpha, tento di aggiustare la policy
@@ -64,17 +68,20 @@ class DoraemonCallback(BaseCallback):
 		return True
 
 	def estimate_success_rate(self, old_a, old_b, new_a, new_b):
-		# TODO: FIX IN SOME WAY, it does not run well
-		successes = 0.0
+		numeratore = 0.0
+		denominatore = 0.0
+
 		for k in range(self.K):
 			e_k = self.dynamics_params[k]
 			t_k = self.trajectories[k]
 			
 			success = 1 if t_k >= self.success_threeshold else 0
 			w_k = self.nu_phi(new_a, new_b, e_k) / self.nu_phi(old_a, old_b, e_k)
-			successes += w_k * success
-   
-		return successes
+			
+			numeratore += w_k * success
+			denominatore += w_k
+
+		return numeratore / (denominatore + 1e-8)  
 
 
 	def nu_phi(self, a_list, b_list, xi, eps=1e-10):
@@ -106,39 +113,36 @@ class DoraemonCallback(BaseCallback):
 			total_kl += kl
 		return total_kl
 
-
-	def beta_entropy(self, A, B):
-		return sum(beta(a, b).entropy() for a, b in zip(A, B))
-
-
 	def update_dist(self):
-		step = 2.0
+		step = self.step
 		candidates = []
 
-		new_a = self.a[:]
-		new_b = self.b[:]
+		new_a = self.a[:].copy()
+		new_b = self.b[:].copy()
+  
 		for s in [-step, step]:
 			for i in range(len(self.a)):
 				new_a[i] = max(1.0, self.a[i] + s)
 				kl = self.kl_divergence(self.a, self.b, new_a, new_b)
 				if kl <= self.epsilon:
 					G_ha =  self.estimate_success_rate(self.a, self.b, new_a, new_b)
-					if G_ha >= self.alpha:
+					if G_ha < self.alpha:
 						entropy = sum(beta(a, b).entropy() for a, b in zip(new_a, new_b))
 						candidates.append((entropy, new_a, new_b))
 
 				new_b[i] = max(1.0, self.b[i] + s)
 				kl = self.kl_divergence(self.a, self.b, new_a, new_b)
-
 				if kl <= self.epsilon:
 					G_ha =  self.estimate_success_rate(self.a, self.b, new_a, new_b)
-					if G_ha >= self.alpha:
+					if G_ha < self.alpha:
 						entropy = sum(beta(a, b).entropy() for a, b in zip(new_a, new_b))
 						candidates.append((entropy, new_a, new_b))
 
 		if candidates:
 			best = max(candidates, key=lambda x: x[0])
-			print(best)
+			if (self.verbose == 1):
+				print(best)
+
 			self.a = best[1]
 			self.b = best[2]
 		
@@ -151,10 +155,17 @@ def train_test_ppo_with_doraemon (
 	episodes: int = 8000,
 	timesteps: int = 300,
 	gamma: float = 0.99,
-	learning_rate=1e-3,
-	delta: int = 1,
+	learning_rate: float = 1e-3,
 	print_std_deviation: bool = False,
-	seed: int = 10
+	seed: int = 10,
+	verbose: int = 0,
+
+	# parametri doraemmon
+ 	epsilon: float = 0.05,
+	step: float = 2.0,
+	delta: float = 0.5,
+	alpha: float = 0.5
+ 
 ):
 	random.seed(seed)
 	np.random.seed(seed)
@@ -179,13 +190,22 @@ def train_test_ppo_with_doraemon (
 			test_env=test_env,
 			print_test_std=print_std_deviation
 		),
-		DoraemonCallback(agent, delta=delta)
+		DoraemonCallback(
+      		agent,
+         	verbose=verbose,
+
+			# doraemon parameters
+			epsilon=epsilon,
+			step=step,
+			alpha=alpha,
+        	delta=delta, 
+        )
 	]
   
 	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
 
 
-n_episodes = 20000
+n_episodes = 4000
 mean_timestep = 300
 target_env = "CustomHopper-target-v0"
 source_env = "CustomHopper-source-v0"
@@ -206,6 +226,6 @@ train_test_ppo_with_doraemon(
 	gamma=optimized_gamma,
 	timesteps=mean_timestep,
 	print_std_deviation=True,
-	seed=seed
+	seed=seed,
 )
 
