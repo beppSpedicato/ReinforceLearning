@@ -35,7 +35,8 @@ def train_test_ppo_with_udr (
     learning_rate=1e-3,
 	delta: int = 1,
 	print_std_deviation: bool = False,
-	seed: int = 10
+	seed: int = 10,
+	model_output_path: str = None
 ):
 	random.seed(seed)
 	np.random.seed(seed)
@@ -63,5 +64,5 @@ def train_test_ppo_with_udr (
 		UDRCallback(agent, delta=delta)
 	]
   
-	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
+	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=model_output_path)
 

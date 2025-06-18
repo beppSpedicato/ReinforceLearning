@@ -164,7 +164,9 @@ def train_test_ppo_with_doraemon (
  	epsilon: float = 0.05,
 	step: float = 2.0,
 	delta: float = 0.5,
-	alpha: float = 0.5
+	alpha: float = 0.5,
+
+	model_output_path: str = None
  
 ):
 	random.seed(seed)
@@ -202,6 +204,6 @@ def train_test_ppo_with_doraemon (
         )
 	]
   
-	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=None)
+	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=model_output_path)
 
 
