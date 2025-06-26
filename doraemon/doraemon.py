@@ -9,18 +9,31 @@ import os
 from scipy.special import kl_div
 
 class DoraemonCallback(BaseCallback):
+	"""
+	Doraemon Domain Randomization Callback
+	
+	This callback implements the Doraemon algorithm for dynamic domain randomization.
+	It maintains beta distributions for environment parameters and updates them based
+	on the agent's performance using importance sampling and KL divergence constraints.
+	
+	The algorithm works by:
+	1. Collecting trajectories and their corresponding environment parameters
+	2. Estimating success rates using importance sampling
+	3. Updating parameter distributions when success rate is below threshold
+	"""
+	
 	def __init__(
 		self,
 		model: PPO,
 		verbose: int = 0,
 		delta: float = 0.5,
-		a: list = [100, 100, 100],
-		b: list = [100, 100, 100],
-		K: int = 20,
-		alpha: float = 0.5,
-        epsilon: float = 0.05,
-        step: float = 2.0,
-		success_threeshold: int = 1600,
+		a: list = [100, 100, 100],  # Alpha parameters for beta distributions
+        b: list = [100, 100, 100],  # Beta parameters for beta distributions
+        K: int = 20,                # Number of trajectories to collect before updating
+        alpha: float = 0.5,         # Success rate threshold
+        epsilon: float = 0.05,      # KL divergence constraint
+        step: float = 2.0,          # Step size for parameter updates
+        success_threeshold: int = 1600,  # Minimum reward to consider trajectory successful
 	):
 		self.delta = delta
 		self.a = a
@@ -43,21 +56,20 @@ class DoraemonCallback(BaseCallback):
 		self.current_reward += reward
   
 		if done:
-			# APPLICO DISTRIBUZIONE
+			# Apply distribution to environment masses
 			params = self.training_env.envs[0].beta_sample_parameters(self.a, self.b, self.delta, log=(self.verbose==1))
 
-			# Colleziono traiettoria e parametri
+			# Collect Trajectories and Environment Parameters
 			self.trajectories.append(self.current_reward)
 			self.dynamics_params.append(params)
 
-			# Quando ho K traiettorie
+			# When K trajectories was collected:
 			if len(self.trajectories) >= self.K:
 				G_ha = self.estimate_success_rate(self.a, self.b, self.a, self.b)
 				if (G_ha > 0 and self.verbose == 1):
 					print(G_ha)
 
 				if (G_ha < self.alpha):
-					# se minore di alpha, tento di aggiustare la policy
 					self.update_dist()
 
 				self.trajectories = []
@@ -160,7 +172,7 @@ def train_test_ppo_with_doraemon (
 	seed: int = 10,
 	verbose: int = 0,
 
-	# parametri doraemmon
+	# doraemon parameters
  	epsilon: float = 0.05,
 	step: float = 2.0,
 	delta: float = 0.5,
@@ -193,15 +205,15 @@ def train_test_ppo_with_doraemon (
 			print_test_std=print_std_deviation
 		),
 		DoraemonCallback(
-      		agent,
-         	verbose=verbose,
+	  		agent,
+		 	verbose=verbose,
 
 			# doraemon parameters
 			epsilon=epsilon,
 			step=step,
 			alpha=alpha,
-        	delta=delta, 
-        )
+			delta=delta, 
+		)
 	]
   
 	train(agent, callbacks=callbacks, total_timestep=episodes*timesteps, model_output_path=model_output_path)

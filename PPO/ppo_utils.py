@@ -138,9 +138,8 @@ class TrainTestCallback(BaseCallback):
         self.test_std = []
 
     def _on_step(self):
-        """Action to be done at each step."""
-        reward = self.locals['rewards'][0] # float
-        done = self.locals['dones'][0] # bool
+        reward = self.locals['rewards'][0]
+        done = self.locals['dones'][0]
 
         self.current_reward += reward
         self.current_episode_length += 1

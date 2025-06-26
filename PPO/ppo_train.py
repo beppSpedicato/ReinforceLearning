@@ -71,7 +71,7 @@ def main():
 		policy_type=config['policy_type'],
 		env=config['env_name'],
 		tensorboard_log=tensorboard_log,
-		clip_range=args.clip_range
+		clip_range=args.clip_range,
 		learning_rate=args.learning_rate,
 		gamma=args.gamma,
 	)

@@ -1,5 +1,5 @@
 """Train an RL agent on the OpenAI Gym Hopper environment using
-	REINFORCE 
+	Actor Critic 
 """
 import argparse
 import os
@@ -35,7 +35,6 @@ def main():
 	np.random.seed(10)
 	torch.manual_seed(10)
 	env = gym.make('CustomHopper-source-v0')
-	# env = gym.make('CustomHopper-target-v0')
 
 	print('Action space:', env.action_space)
 	print('State space:', env.observation_space)

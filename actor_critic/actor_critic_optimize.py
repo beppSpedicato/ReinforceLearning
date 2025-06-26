@@ -69,10 +69,6 @@ def optimize_window_mean(alpha1, alpha2, n_episodes, start=0, end=-1):
 def objective(trial):
     alpha1 = trial.suggest_float("alpha1", 1e-3, 1.0, log=True)
     alpha2 = trial.suggest_float("alpha2", 1e-3, 1.0, log=True)
-    
-    """ norm = alpha1 + alpha2
-    alpha1 /= norm
-    alpha2 /= norm """
 
 
     total_reward = optimize_window_mean(alpha1, alpha2, args.n_episodes, start=args.start_window, end=args.end_window)

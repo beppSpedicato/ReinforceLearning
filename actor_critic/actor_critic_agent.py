@@ -129,13 +129,6 @@ class ActorCriticAgent(object):
         total_loss = self.alpha1*actor_loss + self.alpha2*critic_loss
         total_loss.backward()
         self.optimizer.step()
-
-
-        """ actor_loss.backward()
-        self.optimizer.step()
-
-        critic_loss.backward()
-        self.optimizer.step() """
     
         return        
 

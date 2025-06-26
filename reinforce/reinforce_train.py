@@ -141,4 +141,4 @@ if __name__ == '__main__':
 		f'./trained-models/reinforce_b50/train_rewards_means_b50.txt', 
 		f'./trained-models/reinforce_b85/train_rewards_means_b85.txt'
 	]
-	plot_multiplethings_window(files)
+	plotAvgTxtFiles(files, "train_rewards_reinforce")
