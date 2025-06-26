@@ -157,15 +157,17 @@ class DoraemonCallback(BaseCallback):
 
 		if candidates:
 			best = max(candidates, key=lambda x: x[0])
-			if (self.verbose == 1):
+			if (self.verbose == 2):
+				print("> alpha")
 				print(best)
 
 			self.a = best[1]
 			self.b = best[2]
 			
-		else if second_candidates:
+		elif second_candidates:
 			best = max(second_candidates, key=lambda x: x[0])
 			if (self.verbose == 1):
+				print("< alpha")
 				print(best)
 
 			self.a = best[1]
