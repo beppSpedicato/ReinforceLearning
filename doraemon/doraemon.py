@@ -128,6 +128,7 @@ class DoraemonCallback(BaseCallback):
 	def update_dist(self):
 		step = self.step
 		candidates = []
+		second_candidates = []
 
 		new_a = self.a[:].copy()
 		new_b = self.b[:].copy()
@@ -138,20 +139,32 @@ class DoraemonCallback(BaseCallback):
 				kl = self.kl_divergence(self.a, self.b, new_a, new_b)
 				if kl <= self.epsilon:
 					G_ha =  self.estimate_success_rate(self.a, self.b, new_a, new_b)
-					if G_ha < self.alpha:
+					if G_ha >= self.alpha:
 						entropy = sum(beta(a, b).entropy() for a, b in zip(new_a, new_b))
 						candidates.append((entropy, new_a, new_b))
+					else:
+						second_candidates.append((G_ha, new_a, new_b))
 
 				new_b[i] = max(1.0, self.b[i] + s)
 				kl = self.kl_divergence(self.a, self.b, new_a, new_b)
 				if kl <= self.epsilon:
 					G_ha =  self.estimate_success_rate(self.a, self.b, new_a, new_b)
-					if G_ha < self.alpha:
+					if G_ha >= self.alpha:
 						entropy = sum(beta(a, b).entropy() for a, b in zip(new_a, new_b))
 						candidates.append((entropy, new_a, new_b))
+					else:
+						second_candidates.append((G_ha, new_a, new_b))
 
 		if candidates:
 			best = max(candidates, key=lambda x: x[0])
+			if (self.verbose == 1):
+				print(best)
+
+			self.a = best[1]
+			self.b = best[2]
+			
+		else if second_candidates:
+			best = max(second_candidates, key=lambda x: x[0])
 			if (self.verbose == 1):
 				print(best)
 
